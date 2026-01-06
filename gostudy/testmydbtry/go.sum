@@ -1,0 +1,4 @@
+github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
+github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
+github.com/rayskiy7/gostudy v0.0.0-20241030175210-85ae9d8f3ce2 h1:irNit0kMHle7UT26+RIY5jJ93/9BrvwGl7MiKsYjDj4=
+github.com/rayskiy7/gostudy v0.0.0-20241030175210-85ae9d8f3ce2/go.mod h1:TaPwxRhGhhGJhDCTCSiipnx9Q02UFG+jElwbyzOgJEI=
