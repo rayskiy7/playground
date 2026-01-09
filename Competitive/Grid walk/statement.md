@@ -38,4 +38,4 @@ Return *the resulting array* `answer`.
 * `1 <= grid[i][j], queries[i] <= 10^6`
 
 ## Original problem
-See on [leetcode](https://leetcode.com/problems/maximum-number-of-points-from-grid-queries/description/)
+See on [leetcode](https://leetcode.com/problems/maximum-number-of-points-from-grid-queries/description/).
