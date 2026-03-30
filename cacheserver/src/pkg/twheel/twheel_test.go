@@ -29,7 +29,7 @@ func TestTimingWheel_ProductionStress(t *testing.T) {
 		Interval: 10 * time.Millisecond, // << cancel timeout
 		NLevels:  4,
 		NBuckets: 20,
-		MaxTTL:   10 * time.Second,
+		MaxTTL:   5 * time.Second,
 	}
 
 	tw := NewTimingWheel[int](ctx, props)
@@ -57,18 +57,16 @@ func TestTimingWheel_ProductionStress(t *testing.T) {
 				offset := time.Duration(j*40) * time.Millisecond // + 10*time.Millisecond $$$
 				expire := time.Now().Add(offset)
 
-				event, err := tw.Put(workerID*100_000+j, expire)
-				if err == nil {
-					planned.Add(1)
+				event := tw.Put(workerID*100_000+j, expire)
+				planned.Add(1)
 
-					if j%2 == 0 {
-						go func(e *Event[int], off time.Duration) {
-							time.Sleep(off / 2)
-							if err := tw.Del(e); err == nil {
-								deleted.Add(1)
-							}
-						}(event, offset)
-					}
+				if j%2 == 0 {
+					go func(e *Event[int], off time.Duration) {
+						time.Sleep(off / 2)
+						if err := tw.Del(e); err == nil {
+							deleted.Add(1)
+						}
+					}(event, offset)
 				}
 
 				time.Sleep(1 * time.Millisecond)

@@ -30,7 +30,7 @@ func TestCache_FullLifecycle(t *testing.T) {
 		} else if delta < 0 {
 			exp = start.Add(delta)
 		}
-		_ = c.Set(key, []byte("payload"), exp)
+		c.Set(key, []byte("payload"), exp)
 	}
 
 	// --- PHASE 1: FILL ---

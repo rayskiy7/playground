@@ -33,8 +33,8 @@ func (c *shardedCache) hash(key string) uint64 {
 	return h % uint64(c.n)
 }
 
-func (c *shardedCache) Set(key string, value []byte, expires time.Time) error {
-	return c.shards[c.hash(key)].set(key, value, expires)
+func (c *shardedCache) Set(key string, value []byte, expires time.Time) {
+	c.shards[c.hash(key)].set(key, value, expires)
 }
 
 func (c *shardedCache) Get(key string) ([]byte, bool) {

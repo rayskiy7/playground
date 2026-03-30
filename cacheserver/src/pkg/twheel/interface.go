@@ -17,13 +17,16 @@ var ErrNilEventDeletion = errors.New("nil event deletion is not allowed in Timin
 var ErrEventDead = errors.New("event dead: is canceled or is read")
 
 type TimingWheel[V any] interface {
-	Put(value V, expirationTime time.Time) (*Event[V], error)
+	Put(value V, expirationTime time.Time) *Event[V]
 	Del(event *Event[V]) error
 	Ready() <-chan *Event[V]
 
 	Stop()
 }
 
+// Note:
+// on put of event with inappropriate expirationTime, not in [now, now+MaxTTL], this time will be stricted:
+// (-∞      -     -   -  - -> [now;   now+MaxTTL] <- -  -   -    -     -        +∞)
 var DefaultProps = Props{
 	Interval: 250 * time.Millisecond,
 	NLevels:  8,
@@ -43,19 +46,13 @@ func NewTimingWheel[V any](ctx context.Context, props Props) TimingWheel[V] {
 	return newHandler[V](ctx, props)
 }
 
-// IMPLEMENTATION =====================================================================
-
-func (h *handler[V]) Put(v V, ts time.Time) (*Event[V], error) {
-	now := time.Now() // ? may be optimized
-	if ts.Before(now.Add(-time.Hour)) || ts.After(now.Add(h.wheel.MaxTTL)) {
-		return nil, ErrInvalidExpireTime
-	}
+func (h *handler[V]) Put(v V, ts time.Time) *Event[V] {
 	e := &Event[V]{ // * MAIN ALLOCATION POINT (consider Pool, Prealloc, Limits, etc)
 		V:  v,
 		Ts: ts,
 	}
 	h.put <- e // blocks until wheel's accepted event to handle
-	return e, nil
+	return e
 }
 
 func (h *handler[V]) Del(e *Event[V]) error {

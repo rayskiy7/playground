@@ -53,8 +53,8 @@ func (b *bucket[V]) del(e *Event[V]) {
 }
 
 func assertProps(props Props) {
-	mustBe := props.MaxTTL > 0 &&
-		props.Interval > 0 &&
+	mustBe := props.MaxTTL >= time.Millisecond &&
+		props.Interval >= time.Millisecond &&
 		props.NLevels >= 2 &&
 		props.NBuckets >= 2 &&
 		doesNotOverflowPow(props.NBuckets, props.NLevels) &&
@@ -99,6 +99,14 @@ func fitsSetMaxTTL(b, p int, interval, maxTTL time.Duration) bool {
 	return acc >= limit
 }
 
-func calcTicks(from, to time.Time, by time.Duration) int64 {
-	return to.UnixNano()/by.Nanoseconds() - from.UnixNano()/by.Nanoseconds()
+func (w *wheel[V]) restrict(ts time.Time) time.Time {
+	L, R := w.now, w.now.Add(w.Interval)
+	switch {
+	case ts.Before(L):
+		return L
+	case ts.After(R):
+		return R
+	default:
+		return ts
+	}
 }

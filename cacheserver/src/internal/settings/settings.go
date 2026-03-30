@@ -26,8 +26,9 @@ var (
 	ImagePath    = os.Getenv("DUMPER_PATH")
 
 	// server:
-	ServerAddress = ":8080"
-	MaxObjectSize = 10 * 1024 * 1024 // 10 MiB
+	ServerAddress      = ":8080"
+	MaxObjectSize      = 10 * 1024 * 1024 // 10 MiB
+	RejectOnBadExpires = true
 )
 
 func WheelProps() twheel.Props {

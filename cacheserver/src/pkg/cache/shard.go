@@ -26,7 +26,7 @@ type shard struct {
 	size   atomic.Int64
 }
 
-func (s *shard) set(key string, value []byte, expires time.Time) (err error) {
+func (s *shard) set(key string, value []byte, expires time.Time) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -42,16 +42,11 @@ func (s *shard) set(key string, value []byte, expires time.Time) (err error) {
 		size:    int64(len(value)),
 	}
 	if !expires.IsZero() {
-		e.event, err = s.tw.Put(key, expires)
-		if err != nil {
-			return err
-		}
+		e.event = s.tw.Put(key, expires)
 	}
 	s.items[key] = e
 	s.length.Add(1)
 	s.size.Add(e.size)
-
-	return nil
 }
 
 func (s *shard) get(key string) ([]byte, bool) {

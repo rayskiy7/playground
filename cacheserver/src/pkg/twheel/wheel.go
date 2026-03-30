@@ -34,7 +34,7 @@ func (w *wheel[V]) calcLevel(ticks int64) int {
 }
 
 func (w *wheel[V]) calcCoords(e *Event[V]) (level, bucket int) {
-	ticks := max(calcTicks(w.now, e.Ts, w.Interval), 0)
+	ticks := int64(w.restrict(e.Ts).Sub(w.now) / w.Interval)
 	l := w.calcLevel(ticks)
 	b := int(ticks / w.pow[l])
 	return l, b

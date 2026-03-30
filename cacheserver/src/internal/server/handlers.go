@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/rayskiy7/playground/cacheserver/internal/settings"
-	"github.com/rayskiy7/playground/cacheserver/pkg/twheel"
 )
 
 func (s *Server) handlePut(w http.ResponseWriter, r *http.Request) {
@@ -40,15 +39,8 @@ func (s *Server) handlePut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.cache.Set(key, value, expires)
-	switch err {
-	case nil:
-		w.WriteHeader(http.StatusCreated)
-	case twheel.ErrInvalidExpireTime:
-		http.Error(w, "Invalid expire time", http.StatusBadRequest)
-	default:
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-	}
+	s.cache.Set(key, value, expires)
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (s *Server) handleGet(w http.ResponseWriter, r *http.Request) {
