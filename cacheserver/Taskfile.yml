@@ -1,0 +1,31 @@
+version: '3'
+
+tasks:
+  run:
+    desc: "build and run service in background"
+    cmds:
+      - docker compose up --build -d
+      - 'echo "runned: http://localhost:8080"'
+      - 'echo "metrics: http://localhost:8080/metrics"'
+      - 'echo "prometheus UI: http://localhost:9090"'
+
+  stop:
+    desc: "stop all containers"
+    cmds:
+      - docker compose down
+
+  logs:
+    desc: "see logs"
+    cmds:
+      - docker logs -f cacheserver-container
+
+  load:
+    desc: "python-script generating random requests"
+    cmds:
+      - python3 scripts/charge.py {{.CLI_ARGS}}
+
+  clean:
+    desc: "delete dumps and stop containers"
+    cmds:
+      - docker compose down
+      - rm -rf ./data/*
