@@ -3,8 +3,10 @@ package cache
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"time"
 
+	"github.com/rayskiy7/playground/cacheserver/internal/settings"
 	"github.com/rayskiy7/playground/cacheserver/pkg/twheel"
 )
 
@@ -14,9 +16,10 @@ const (
 )
 
 type shardedCache struct {
-	n      int
-	shards []*shard
-	wg     sync.WaitGroup
+	n       int
+	shards  []*shard
+	wg      sync.WaitGroup
+	dumpers atomic.Int32
 
 	cancel context.CancelFunc
 }
@@ -59,18 +62,24 @@ func (c *shardedCache) ByteSize() int64 {
 }
 
 func (c *shardedCache) Dump(ctx context.Context) <-chan []byte {
-	out := make(chan []byte, 5*c.n)
+	out := make(chan []byte, settings.DumpBufSize)
 
 	go func() {
 		var wg sync.WaitGroup
+		c.dumpers.Add(1)
 		for _, sh := range c.shards {
 			wg.Go(func() { sh.dump(ctx, out) })
 		}
 		wg.Wait()
+		c.dumpers.Add(-1)
 		close(out)
 	}()
 
 	return out
+}
+
+func (c *shardedCache) IsDumped() bool {
+	return c.dumpers.Load() > 0
 }
 
 func (c *shardedCache) Stop(ctx context.Context) {

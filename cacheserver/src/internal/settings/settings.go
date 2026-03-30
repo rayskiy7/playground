@@ -22,6 +22,7 @@ var (
 
 	// dumper:
 	DumpInterval = 1 * time.Hour
+	DumpBufSize  = 5 * ShardsNumber
 	ImagePath    = os.Getenv("DUMPER_PATH")
 
 	// server:

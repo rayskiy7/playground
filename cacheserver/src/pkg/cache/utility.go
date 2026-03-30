@@ -51,7 +51,7 @@ func deserializeEntries(ctx context.Context, r io.Reader) <-chan record {
 				// 1. Time
 				var nano uint64
 				if err := binary.Read(reader, binary.LittleEndian, &nano); err != nil {
-					return // EOF или ошибка
+					return // EOF or gen err
 				}
 
 				// 2. Key length

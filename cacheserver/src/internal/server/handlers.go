@@ -81,9 +81,9 @@ func (s *Server) liveness(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (s *Server) readiness(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusOK) // TODO: add real check
-}
-
-func (s *Server) metrics(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusOK) // TODO: report with prometheus metrics
+	if s.cache.IsDumped() {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
 }

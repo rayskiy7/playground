@@ -19,6 +19,7 @@ type Cache interface {
 	ByteSize() int64
 
 	Dump(context.Context) <-chan []byte
+	IsDumped() bool
 	Stop(context.Context)
 }
 
